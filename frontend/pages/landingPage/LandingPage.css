@@ -66,7 +66,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 40px;
+  padding: 0 12px;
+  height: 80px; /* ✅ thoda bada navbar */
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(6px);
   position: fixed;
@@ -74,10 +75,19 @@
   width: 100%;
   z-index: 1000;
 }
+
 .nav-left {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+.logo-img {
+  margin-top: 12px;
+  margin-bottom: 4px;
+  height: 100%;
+  max-height: 220px; /* ✅ logo bhi bada */
+  width: auto;
+  object-fit: contain;
 }
 .brand-name {
   font-size: 32px;
@@ -171,9 +181,13 @@
   line-height: 1.1;
   max-width: 900px;
 }
+.setu {
+  font-size: 62px;
+  color: rgb(41, 35, 35);
+}
 .welcome-paragraph {
   font-size: 22px;
-  color: rgba(255, 255, 255, 0.95);
+  color: rgb(255, 255, 255);
   line-height: 1.7;
   margin: 32px 0;
   min-height: 120px;
@@ -296,6 +310,7 @@
   box-shadow: 0 32px 80px rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.2);
   text-align: center;
+  margin-top: 100px;
   width: 100%;
   max-width: 520px;
   transform: scale(0.8) translateY(40px);
@@ -305,6 +320,7 @@
 .login-overlay.visible .login-card {
   transform: scale(1) translateY(0);
 }
+
 .close-btn {
   position: absolute;
   top: 24px;
