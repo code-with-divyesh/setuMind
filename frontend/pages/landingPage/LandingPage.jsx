@@ -1,14 +1,41 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./LandingPage.css";
+import assets from "../../src/assets/assets";
+import { auth } from "../../config/firebase";
+import { signInAnonymously, signOut, onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
   const loginOverlayRef = useRef(null);
   const [typingText, setTypingText] = useState("");
   const [welcomeIndex, setWelcomeIndex] = useState(0);
   const [showCursor, setShowCursor] = useState(true);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Anonymous Login
+
+  // Logout
+  const logoutUser = async () => {
+    try {
+      await signOut(auth);
+      alert("Logged out!");
+      navigate("/"); // ✅ Logout ke baad landing page pe redirect
+    } catch (err) {
+      console.error(err);
+      alert("❌ Logout failed: " + err.message);
+    }
+  };
 
   const welcomeText =
-    "You are not alone. Every day thousands of students struggle with stress, loneliness and depression. SetuMind is your companion - where you can share your feelings without any judgment. Here you will be understood, supported and most importantly - you will feel that you are truly not alone. Your mental health is our priority. 💚";
+    "You are not alone. Every day thousands of students struggle with stress, loneliness and depression. सेतुMind is your companion - where you can share your feelings without any judgment. Here you will be understood, supported and most importantly - you will feel that you are truly not alone. Your mental health is our priority. 💚";
 
   // Emergency help
   const showEmergencyHelp = () => {
@@ -43,14 +70,28 @@ const LandingPage = () => {
     const duration = prompt(
       "Choose meditation duration:\n\n1. 1 minute\n2. 3 minutes\n3. 5 minutes\n\nEnter a number (1-3):"
     );
+
     if (duration && duration >= 1 && duration <= 3) {
       const minutes = [1, 3, 5][duration - 1];
+      let seconds = minutes * 60;
+
       alert(
         `🧘‍♀️ Starting ${minutes}-minute meditation...\n\nFind a comfortable position, close your eyes, and focus on breathing.`
       );
-      setTimeout(() => {
-        alert("🌟 Meditation complete! Great job!");
-      }, minutes * 1000);
+
+      // countdown timer
+      const timer = setInterval(() => {
+        seconds--;
+        console.log(`Time left: ${Math.floor(seconds / 60)}m ${seconds % 60}s`);
+
+        if (seconds <= 0) {
+          clearInterval(timer);
+          // play buzzer
+          alert("🌟 Meditation complete! Great job!");
+        }
+      }, 1000);
+    } else {
+      alert("❌ Invalid choice. Please enter 1, 2, or 3.");
     }
   };
 
@@ -65,19 +106,31 @@ const LandingPage = () => {
   };
 
   // Continue anonymously
-  const continueAnonymously = (e) => {
+  const continueAnonymously = async (e) => {
     const btn = e.currentTarget;
     const originalContent = btn.innerHTML;
+
     btn.innerHTML =
       '<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V2A10 10 0 0 0 2 12h2a8 8 0 0 1 8-8z"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></path></svg>Entering Safely...';
     btn.style.pointerEvents = "none";
     btn.style.opacity = "0.8";
-    setTimeout(() => {
-      alert("🎉 Welcome to SetuMind! Anonymous mode enabled.");
+
+    try {
+      const userCredential = await signInAnonymously(auth);
+      const user = userCredential.user; // Firebase ka user object
+      alert(`✅ Logged in Anonymously!\nUser ID: ${user.uid}`);
+      console.log("Logged in user:", user);
+      if (user) {
+        navigate("/home");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("❌ Login failed: " + err.message);
+    } finally {
       btn.innerHTML = originalContent;
       btn.style.pointerEvents = "all";
       btn.style.opacity = "1";
-    }, 3000);
+    }
   };
 
   const showLogin = () => {
@@ -135,8 +188,9 @@ const LandingPage = () => {
       {/* ✅ Navigation Bar */}
       <nav className="navbar">
         <div className="nav-left">
-          <span className="logo">💚</span>
-          <h1 className="brand-name">SetuMind</h1>
+          {/* <span className="logo">💚</span>
+          <h1 className="brand-name">SetuMind</h1> */}
+          <img src={assets.logo} alt="SetuMind Logo" className="logo-img" />
         </div>
         <div className="nav-right">
           <button className="emergency-btn" onClick={showEmergencyHelp}>
@@ -166,7 +220,9 @@ const LandingPage = () => {
       {/* Main Container */}
       <div className="container">
         <div className="header-section">
-          <h2 className="main-heading">Welcome to SetuMind</h2>
+          <h2 className="main-heading">
+            Welcome to <span class="setu">सेतुMind</span>
+          </h2>
           <p className="welcome-paragraph">
             {typingText}
             {showCursor && <span className="typing-cursor">|</span>}
@@ -206,9 +262,9 @@ const LandingPage = () => {
           >
             Continue Anonymously
           </button>
-          <button className="option-btn login-btn" onClick={showLogin}>
+          {/* <button className="option-btn login-btn" onClick={showLogin}>
             Login / Signup
-          </button>
+          </button> */}
           <div className="privacy-note">
             <p>
               <strong>🔒 Your Privacy is Our Priority:</strong> Anonymous access
