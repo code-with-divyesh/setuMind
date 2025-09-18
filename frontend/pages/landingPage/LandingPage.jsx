@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./LandingPage.css";
-import assets from "../../src/assets/assets";
+// import assets from "../../src/assets/photos";
 import { auth } from "../../config/firebase";
 import { signInAnonymously, signOut, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
@@ -190,7 +190,7 @@ const LandingPage = () => {
         <div className="nav-left">
           {/* <span className="logo">💚</span>
           <h1 className="brand-name">SetuMind</h1> */}
-          <img src={assets.logo} alt="SetuMind Logo" className="logo-img" />
+          <img src="/logo.png" alt="SetuMind Logo" className="logo-img" />
         </div>
         <div className="nav-right">
           <button className="emergency-btn" onClick={showEmergencyHelp}>
